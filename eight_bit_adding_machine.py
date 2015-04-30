@@ -55,6 +55,9 @@ def full_adder(carry_in, in_1, in_2):
 
 #eight bit adding machine
 def eight_bit_adding_machine(eight_bit_str_1, eight_bit_str_2):
+    """
+    can only add numbers from 0 to 255 (8 bit digits). Substraction to come later...
+    """
     validate_eight_bit_strings(eight_bit_str_1, eight_bit_str_2)
 
     in_1_a = eight_bit_str_1[-1]
@@ -83,7 +86,11 @@ def eight_bit_adding_machine(eight_bit_str_1, eight_bit_str_2):
     sum_out_7, carry_out_7 = full_adder(carry_out_6, in_7_a, in_7_b)
     sum_out_8, carry_out_8 = full_adder(carry_out_7, in_8_a, in_8_b)
 
-    return carry_out_8 + sum_out_8 + sum_out_7 + sum_out_6 + sum_out_5 + sum_out_4 + sum_out_3 + sum_out_2 + sum_out_1
+    result = sum_out_8 + sum_out_7 + sum_out_6 + sum_out_5 + sum_out_4 + sum_out_3 + sum_out_2 + sum_out_1
+    if carry_out_8 == '1':
+        result = carry_out_8 + result
+    
+    return result
 
     
 
@@ -117,6 +124,12 @@ def validate_eight_bit_strings(*args):
             raise TypeError("you must provide 8 bit strings as parameters to this function")
         if re.match(r'^[01]{8}$', e) == None:
             raise ValueError("you must provide 8 bit strings composed of only 0s and 1s as parameters to this function")
+
+def bin_to_int(bin_str):
+    return int(bin_str, 2)
+
+def int_to_bin(num):
+    return bin(num).replace('b', '').lstrip('0').zfill(8)[-9:]
         
 
 class Tester(object):
@@ -138,11 +151,17 @@ class Tester(object):
 def main():
     t = Tester()
     t.test(eight_bit_adding_machine('11011101', '11101001') == '111000110')
-    t.test(eight_bit_adding_machine('00000001', '00000001') == '000000010')
+    t.test(eight_bit_adding_machine('00000001', '00000001') == '00000010')
     t.test(eight_bit_adding_machine('11111111', '11111111') == '111111110')
-    t.test(eight_bit_adding_machine('00001001', '10000001') == '010001010')
-    t.test(eight_bit_adding_machine('10000000', '00000001') == '010000001')
-    t.test(eight_bit_adding_machine('10101010', '01010101') == '011111111')
+    t.test(eight_bit_adding_machine('00001001', '10000001') == '10001010')
+    t.test(eight_bit_adding_machine('10000000', '00000001') == '10000001')
+    t.test(eight_bit_adding_machine('10101010', '01010101') == '11111111')
+
+    #testing with decimal numbers
+    t.test(eight_bit_adding_machine(int_to_bin(10), int_to_bin(25)) == int_to_bin(35))
+    t.test(eight_bit_adding_machine(int_to_bin(255), int_to_bin(255)) == int_to_bin(510))
+    t.test(eight_bit_adding_machine(int_to_bin(100), int_to_bin(25)) == int_to_bin(125))
+    t.test(eight_bit_adding_machine(int_to_bin(16), int_to_bin(66)) == int_to_bin(82))
 
     print 'all tests passed successfully'
 
